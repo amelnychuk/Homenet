@@ -69,5 +69,5 @@ def getEventColors():
     #get event colors
     eventcolors = service.colors().get().execute().get('event')
 
-    return [eventcolors[event['colorId']]['background'] for event in events]
+    return [ (event['summary'], eventcolors[event['colorId']]['background']) for event in events]
 
