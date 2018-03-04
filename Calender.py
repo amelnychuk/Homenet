@@ -53,7 +53,7 @@ def get_credentials():
 
 
 
-def getEventColors():
+def getEventData():
 
     #getCredentials
     credentials = get_credentials()

@@ -6,7 +6,7 @@ import time
 from phue import Bridge
 from _utils import Color
 from gtts import gTTS
-from Calender import getEventColors
+from Calender import getEventData
 import Speaker
 
 
@@ -22,9 +22,12 @@ R,G,B = (0.48046875, 0.81640625, 0.28125)
 
 #fade on to orange in deci-seconds
 zone = Speaker.getZone()
+
 server = Speaker.HttpServer(8000)
 server.start()
-for eventTxt, eventColor in getEventColors():
+
+for eventTxt, eventColor in getEventData():
+
     print eventColor
     command = {'transitiontime': 30,
                'on': True,
@@ -32,9 +35,10 @@ for eventTxt, eventColor in getEventColors():
                'xy': Color(eventColor).asCt()}
 
     speech = gTTS(text=eventTxt, lang='en', slow=False)
-    mp3file = (eventTxt + ".mp3").replace(" ","")
 
+    mp3file = (eventTxt + ".mp3").replace(" ","")
     speech.save(mp3file)
+
     print ("Print saved file: {}".format(mp3file))
     Speaker.play_file(zone, mp3file, port=8000)
 
