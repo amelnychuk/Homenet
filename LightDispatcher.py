@@ -17,7 +17,7 @@ import Speaker
 b = Bridge()
 b.connect()
 
-R,G,B = (0.48046875, 0.81640625, 0.28125)
+
 
 
 #fade on to orange in deci-seconds
