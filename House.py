@@ -28,6 +28,11 @@ class House(object):
         self._speakers = {speaker.player_name : speaker for speaker in sonos}
 
     def hueDiscover(self):
+        """
+        Gets hue lights
+        Returns:
+
+        """
         bridge = Bridge()
         bridge.connect()
 
@@ -38,6 +43,7 @@ class House(object):
 
     def getSpeakerNames(self):
         return self._speakers.keys()
+
     def startServer(self):
         pass
 
@@ -64,7 +70,8 @@ class Zone(House):
     """
     This has a collection of light and speaker names. Can load from Json config file.
     """
-    def __init__(self):
+    def __init__(self, name):
+        self._name = name
         self._lights = []
         self._speakers = []
 
