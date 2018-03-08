@@ -5,7 +5,8 @@
 
 import os
 
-
+import soco
+from phue import Bridge
 
 class House(object):
     #maybe a singleton with http server
@@ -14,9 +15,29 @@ class House(object):
 
 
     def __init__(self):
-        pass
+        self.sonosDiscovery()
+        self.hueDiscover()
 
+    def sonosDiscovery(self):
+        """
+        Collects up the speakers into a dictionary
+        Returns:
 
+        """
+        sonos = list(soco.discover())
+        self._speakers = {speaker.player_name : speaker for speaker in sonos}
+
+    def hueDiscover(self):
+        bridge = Bridge()
+        bridge.connect()
+
+        self._lights = {light.name: light for light in bridge.get_light_objects()}
+
+    def getSpeakers(self):
+        return self._speakers
+
+    def getSpeakerNames(self):
+        return self._speakers.keys()
     def startServer(self):
         pass
 
