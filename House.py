@@ -8,6 +8,9 @@ import os
 import soco
 from phue import Bridge
 
+from collections import OrderedDict
+import json
+
 class House(object):
     #maybe a singleton with http server
     #resources
@@ -18,16 +21,18 @@ class House(object):
         self.sonosDiscovery()
         self.hueDiscover()
 
-    def sonosDiscovery(self):
+    @classmethod
+    def sonosDiscovery(cls):
         """
         Collects up the speakers into a dictionary
         Returns:
 
         """
         sonos = list(soco.discover())
-        self._speakers = {speaker.player_name : speaker for speaker in sonos}
+        cls._speakers = {speaker.player_name : speaker for speaker in sonos}
 
-    def hueDiscover(self):
+    @classmethod
+    def hueDiscover(cls):
         """
         Gets hue lights
         Returns:
@@ -36,13 +41,15 @@ class House(object):
         bridge = Bridge()
         bridge.connect()
 
-        self._lights = {light.name: light for light in bridge.get_light_objects()}
+        cls._lights = {light.name: light for light in bridge.get_light_objects()}
 
-    def getSpeakers(self):
-        return self._speakers
+    @classmethod
+    def getSpeakers(cls):
+        return cls._speakers
 
-    def getSpeakerNames(self):
-        return self._speakers.keys()
+    @classmethod
+    def getSpeakerNames(cls):
+        return cls._speakers.keys()
 
     def startServer(self):
         pass
@@ -66,14 +73,46 @@ class House(object):
 
 
 
-class Zone(House):
+class Zone(OrderedDict, House):
     """
-    This has a collection of light and speaker names. Can load from Json config file.
+    This has a collection of light and speaker names. Easily converts json files.
     """
+
+    # TODO:: finish up structure of zones
+
     def __init__(self, name):
-        self._name = name
-        self._lights = []
-        self._speakers = []
+        super(Zone, self).__init__()
+        self['name'] = name
+
+        self.devices = {'lights': [],
+        'speakers': []}
+
+    def __getattr__(self, name):
+        if not name.startswith('_'):
+            return self[name]
+        super(Zone, self).__getattr__(name)
+
+    def __setattr__(self, name, value):
+        if not name.startswith('_'):
+            self[name] = value
+        else:
+            super(Zone, self).__setattr__(name, value)
+
+    def asJson(self):
+        return json.dumps(self, indent=4)
+
+    def load(self):
+        pass
+
+    def save(self):
+        pass
+
+
+
+
+
+    def setName(self, name):
+        pass
 
     def addSpeakers(self, speakerName):
         """
@@ -86,13 +125,15 @@ class Zone(House):
         """
         if type(speakerName) == str:
             if speakerName in House.getSpeakerNames():
-                self._speakers.append(speakerName)
+                self.devices['speakers'].append(speakerName)
         elif type(speakerName) == list:
 
             for speaker in speakerName:
                 if type(speaker) == str:
                     if speakerName in House.getSpeakerNames():
-                        self._speakers.extend(speakerName)
+                        self.devices['speakers'].extend(speakerName)
+
+
 
     def getSpeakers(self):
         pass
