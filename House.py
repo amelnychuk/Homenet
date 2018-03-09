@@ -85,9 +85,14 @@ class Zone(House):
 
         """
         if type(speakerName) == str:
-            self._speakers.append(speakerName)
-        else:
-            self._speakers.extend(speakerName)
+            if speakerName in House.getSpeakerNames():
+                self._speakers.append(speakerName)
+        elif type(speakerName) == list:
+
+            for speaker in speakerName:
+                if type(speaker) == str:
+                    if speakerName in House.getSpeakerNames():
+                        self._speakers.extend(speakerName)
 
     def getSpeakers(self):
         pass
