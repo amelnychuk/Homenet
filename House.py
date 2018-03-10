@@ -12,17 +12,27 @@ from collections import OrderedDict
 import json
 
 class CaseInsensitiveDict(dict):
+
+    def __init__(self, *args, **kwargs):
+        super(CaseInsensitiveDict, self).__init__(*args, **kwargs)
+        self._convert_keys()
+
     def __setitem__(self, key, value):
         super(CaseInsensitiveDict, self).__setitem__(key.lower().replace(" ",""), value)
 
     def __getitem__(self, key):
         return super(CaseInsensitiveDict, self).__getitem__(key.lower().replace(" ",""))
 
+    def _convert_keys(self):
+        for k in list(self.keys()):
+            v = super(CaseInsensitiveDict, self).pop(k)
+            self.__setitem__(k, v)
+
 class Brain(object):
     """
     Collects up all the devices in the home.
     """
-
+    # TODO :: generalize data structure to handle all different types of devices
     def __init__(self):
         print "Discover"
         self.speakerDiscover()
@@ -35,6 +45,7 @@ class Brain(object):
         Finds all sonos speakers
 
         """
+        # TODO:: send a message to the speakers to verify
         cls.speakers = CaseInsensitiveDict((speaker.player_name, speaker) for speaker in list(soco.discover()))
 
         #cls.speakers = {speaker.player_name: speaker for speaker in list(soco.discover())}
@@ -48,8 +59,8 @@ class Brain(object):
 
         bridge = Bridge()
         bridge.connect()
-
-        cls.lights = {light.name: light for light in bridge.get_light_objects()}
+        # TODO :: Varification of lights
+        cls.lights = CaseInsensitiveDict((light.name, light) for light in bridge.get_light_objects())
 
 
 
@@ -125,11 +136,14 @@ class Zone(HouseAI):
 
     def __init__(self, name):
         super(Zone, self).__init__()
+
         self.data = {}
 
         self.data['name'] = name
         self.data['devices'] = {'lights': [],
         'speakers': []}
+
+        self.autoLoad()
 
 
 
@@ -149,6 +163,9 @@ class Zone(HouseAI):
     def setName(self, name):
         pass
 
+    def getName(self):
+        return self.data['name']
+
     def _addDevice(self, devicetype ,deviceName):
         """
 
@@ -159,6 +176,7 @@ class Zone(HouseAI):
 
         """
         # TODO:: Add else on messages
+        deviceName = deviceName.lower().replace(" ", "")
         if devicetype in self.data['devices'].keys():
             if type(deviceName) == str:
                 if deviceName in HouseAI.getSpeakerNames():
@@ -175,6 +193,14 @@ class Zone(HouseAI):
 
     def addSpeaker(self, speakerName):
         self._addDevice('speakers', speakerName)
+
+    def autoLoad(self):
+        print "autoloading"
+        #todo :: handle multiple speakers and lights of multiple names
+        self.addSpeaker( self.getName())
+        self.addSpeaker( self.getName())
+
+
         
 
 
