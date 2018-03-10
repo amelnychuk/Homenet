@@ -11,48 +11,72 @@ from phue import Bridge
 from collections import OrderedDict
 import json
 
-class MetaClass(type):
-    def __init__(cls, name, bases, d):
-        type.__init__(cls, name, bases, d)
+class CaseInsensitiveDict(dict):
+    def __setitem__(self, key, value):
+        super(CaseInsensitiveDict, self).__setitem__(key.lower().replace(" ",""), value)
 
+    def __getitem__(self, key):
+        return super(CaseInsensitiveDict, self).__getitem__(key.lower().replace(" ",""))
 
-
-
-class House(object):
-    #maybe a singleton with http server
-    #resources
-    #control time
-
+class Brain(object):
+    """
+    Collects up all the devices in the home.
+    """
 
     def __init__(self):
-        print "House"
-        self.sonosDiscovery()
+        print "Discover"
+        self.speakerDiscover()
         self.hueDiscover()
 
     @classmethod
-    def sonosDiscovery(cls):
+    def speakerDiscover(cls):
         """
-        Collects up the speakers into a dictionary
-        Returns:
+
+        Finds all sonos speakers
 
         """
-        print "Print discovering speakers"
-        sonos = list(soco.discover())
-        cls.speakers = {speaker.player_name : speaker for speaker in sonos}
+        cls.speakers = CaseInsensitiveDict((speaker.player_name, speaker) for speaker in list(soco.discover()))
 
+        #cls.speakers = {speaker.player_name: speaker for speaker in list(soco.discover())}
 
     @classmethod
     def hueDiscover(cls):
         """
         Gets hue lights
-        Returns:
 
         """
-        print "discovering lights"
+
         bridge = Bridge()
         bridge.connect()
 
         cls.lights = {light.name: light for light in bridge.get_light_objects()}
+
+
+
+class HouseAI(Brain):
+    #maybe a singleton with http server
+    #resources
+    #control time
+
+    # TODO:: Auto load devices by Zone name
+    # TODO:: Create a metaclass to register created zones
+    # TODO:: Auto load zone files
+    # TODO:: Start HTTPS Server
+    # TODO:: Scoop up schedual from google calendar
+
+    def __init__(self):
+        super(HouseAI, self).__init__()
+        print "House"
+        #these might be sets
+        #list of zones
+        self.zones = []
+        #list of events
+        self.scheds =[]
+
+
+    def addZone(self, zone):
+        self.zones.append(zone)
+
 
     @classmethod
     def getSpeakers(cls):
@@ -92,33 +116,25 @@ class House(object):
 
 
 
-class Zone(OrderedDict, House):
+class Zone(HouseAI):
     """
-    This has a collection of light and speaker names. Easily converts json files.
+    This has a collection of light and speaker names. Easily converts and loads json files.
     """
 
     # TODO:: finish up structure of zones
 
     def __init__(self, name):
         super(Zone, self).__init__()
-        self['name'] = name
+        self.data = {}
 
-        self.devices = {'lights': [],
+        self.data['name'] = name
+        self.data['devices'] = {'lights': [],
         'speakers': []}
 
-    def __getattr__(self, name):
-        if not name.startswith('_'):
-            return self[name]
-        OrderedDict.__getattr__(self,name)
 
-    def __setattr__(self, name, value):
-        if not name.startswith('_'):
-            self[name] = value
-        else:
-            OrderedDict.__setattr__(self, name, value)
 
     def asJson(self):
-        return json.dumps(self, indent=4)
+        return json.dumps(self.data, indent=4)
 
     def load(self):
         pass
@@ -143,38 +159,22 @@ class Zone(OrderedDict, House):
 
         """
         # TODO:: Add else on messages
-        if devicetype in self.devices.keys():
+        if devicetype in self.data['devices'].keys():
             if type(deviceName) == str:
-                if deviceName in House.getSpeakerNames():
-                    self.devices[devicetype].append(deviceName)
+                if deviceName in HouseAI.getSpeakerNames():
+                    self.data['devices'][devicetype].append(deviceName)
 
             elif type(deviceName) == list:
                 for dn in deviceName:
                     if type(dn) == str:
-                        if dn in House.getSpeakerNames():
-                            self.devices[devicetype].extend(deviceName)
+                        if dn in HouseAI.getSpeakerNames():
+                            self.data['devices'][devicetype].extend(deviceName)
                         
-    def addLights(self, lightName):
+    def addLight(self, lightName):
         self._addDevice('lights', lightName)
 
     def addSpeaker(self, speakerName):
         self._addDevice('speakers', speakerName)
         
 
-
-"""
-    def getSpeakers(self):
-        return House.getSpeakers()
-
-    def getLights(self):
-        return House.getLights()
-        
-"""
-h = House()
-#h.getSpeakers()
-z = Zone('LivingRoom')
-z.getSpeakers()
-z.addSpeaker('Living Room')
-print z.getLights()
-print z
 
