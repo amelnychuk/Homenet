@@ -11,6 +11,13 @@ from phue import Bridge
 from collections import OrderedDict
 import json
 
+class MetaClass(type):
+    def __init__(cls, name, bases, d):
+        type.__init__(cls, name, bases, d)
+
+
+
+
 class House(object):
     #maybe a singleton with http server
     #resources
@@ -18,6 +25,7 @@ class House(object):
 
 
     def __init__(self):
+        print "House"
         self.sonosDiscovery()
         self.hueDiscover()
 
@@ -28,8 +36,10 @@ class House(object):
         Returns:
 
         """
+        print "Print discovering speakers"
         sonos = list(soco.discover())
-        cls._speakers = {speaker.player_name : speaker for speaker in sonos}
+        cls.speakers = {speaker.player_name : speaker for speaker in sonos}
+
 
     @classmethod
     def hueDiscover(cls):
@@ -38,18 +48,27 @@ class House(object):
         Returns:
 
         """
+        print "discovering lights"
         bridge = Bridge()
         bridge.connect()
 
-        cls._lights = {light.name: light for light in bridge.get_light_objects()}
+        cls.lights = {light.name: light for light in bridge.get_light_objects()}
 
     @classmethod
     def getSpeakers(cls):
-        return cls._speakers
+        return cls.speakers
 
     @classmethod
     def getSpeakerNames(cls):
-        return cls._speakers.keys()
+        return cls.speakers.keys()
+
+    @classmethod
+    def getLights(cls):
+        return cls.lights
+
+    @classmethod
+    def getLightNames(cls):
+        return cls.lights.keys()
 
     def startServer(self):
         pass
@@ -90,13 +109,13 @@ class Zone(OrderedDict, House):
     def __getattr__(self, name):
         if not name.startswith('_'):
             return self[name]
-        super(Zone, self).__getattr__(name)
+        OrderedDict.__getattr__(self,name)
 
     def __setattr__(self, name, value):
         if not name.startswith('_'):
             self[name] = value
         else:
-            super(Zone, self).__setattr__(name, value)
+            OrderedDict.__setattr__(self, name, value)
 
     def asJson(self):
         return json.dumps(self, indent=4)
@@ -114,41 +133,48 @@ class Zone(OrderedDict, House):
     def setName(self, name):
         pass
 
-    def addSpeakers(self, speakerName):
+    def _addDevice(self, devicetype ,deviceName):
         """
 
         Args:
-            speakerName: (str) or (list of str) adds speaker names to objects
+            deviceName: (str) or (list of str) adds speaker names to objects
 
         Returns:
 
         """
-        if type(speakerName) == str:
-            if speakerName in House.getSpeakerNames():
-                self.devices['speakers'].append(speakerName)
-        elif type(speakerName) == list:
+        # TODO:: Add else on messages
+        if devicetype in self.devices.keys():
+            if type(deviceName) == str:
+                if deviceName in House.getSpeakerNames():
+                    self.devices[devicetype].append(deviceName)
 
-            for speaker in speakerName:
-                if type(speaker) == str:
-                    if speakerName in House.getSpeakerNames():
-                        self.devices['speakers'].extend(speakerName)
+            elif type(deviceName) == list:
+                for dn in deviceName:
+                    if type(dn) == str:
+                        if dn in House.getSpeakerNames():
+                            self.devices[devicetype].extend(deviceName)
+                        
+    def addLights(self, lightName):
+        self._addDevice('lights', lightName)
+
+    def addSpeaker(self, speakerName):
+        self._addDevice('speakers', speakerName)
+        
 
 
-
+"""
     def getSpeakers(self):
-        pass
+        return House.getSpeakers()
 
     def getLights(self):
-        pass
-
-
-class Schedual(House):
-    def __init__(self):
-        pass
-
-    def run(self):
-        pass
-        #set time
-        #execute events
-
+        return House.getLights()
+        
+"""
+h = House()
+#h.getSpeakers()
+z = Zone('LivingRoom')
+z.getSpeakers()
+z.addSpeaker('Living Room')
+print z.getLights()
+print z
 
