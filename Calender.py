@@ -1,4 +1,4 @@
-from __future__ import print_function
+#from __future__ import print_function
 import httplib2
 import os
 
@@ -59,15 +59,31 @@ def getEventData():
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
+    page_token = None
+
+    calendar_list = service.calendarList().list(pageToken=page_token).execute()
+    calendar_id = None
+    for item in calendar_list.get('items', []):
+        if item['summary'] == 'Routine':
+            calendar_id = item['id']
+    #calendar_list_entry = service.calendarList().get(calendarId='pcjici38do0gmr4pg4n6hb2u10@group.calendar.google.com').execute()
+    #print calendar_list_entry
     now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
     #getDayEvents
+    d = datetime.datetime.now()
+    d = d.replace(day=datetime.datetime.now().day+2)
+    tommorow = d.isoformat() + 'Z'
+    #tommorow = datetime.datetime.now().replace(day=datetime.datetime.now().day+2).utcnow().isoformat() + 'Z'
+    print now
+    print tommorow
     eventsResult = service.events().list(
-        calendarId='primary', timeMin=now, maxResults=5, singleEvents=True,
-        orderBy='startTime').execute()
+        calendarId=calendar_id, timeMin=now, timeMax=tommorow,singleEvents=True,orderBy='startTime').execute()
     events = eventsResult.get('items', [])
-
+    print events
     #get event colors
     eventcolors = service.colors().get().execute().get('event')
 
     return [ (event['summary'], eventcolors[event['colorId']]['background']) for event in events]
 
+
+print getEventData()
