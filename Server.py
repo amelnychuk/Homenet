@@ -31,6 +31,7 @@ class HttpServer(Thread):
 
     def __init__(self, port):
         super(HttpServer, self).__init__()
+        os.chdir("./mp3/Notifications")
         self.daemon = True
         handler = SimpleHTTPRequestHandler
         self.httpd = TCPServer(("", port), handler)
@@ -55,16 +56,3 @@ def detect_ip_address():
     ip_address = s.getsockname()[0]
     s.close()
     return ip_address
-
-def play_file(zone, file, port=8000):
-    netpath = 'http://{}:{}/{}'.format(detect_ip_address(), port, file)
-    print( "netpath: ", netpath)
-
-    zone.volume = 100
-    zone.play_uri(uri=netpath)
-
-    #number_in_queue = zone.add_uri_to_queue(netpath)
-    #zone.play_from_queue(number_in_queue)
-
-def getZone():
-    return list(soco.discover())[0]
