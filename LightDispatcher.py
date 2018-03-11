@@ -7,7 +7,7 @@ from phue import Bridge
 from _utils import Color
 from gtts import gTTS
 from Calender import getEventData
-import Speaker
+import Server
 
 
 ##Testing connecting to the bridge
@@ -21,9 +21,9 @@ b.connect()
 
 
 #fade on to orange in deci-seconds
-zone = Speaker.getZone()
+zone = Server.getZone()
 
-server = Speaker.HttpServer(8000)
+server = Server.HttpServer(8000)
 server.start()
 
 for eventTxt, eventColor in getEventData():
@@ -40,7 +40,7 @@ for eventTxt, eventColor in getEventData():
     speech.save(mp3file)
 
     print ("Print saved file: {}".format(mp3file))
-    Speaker.play_file(zone, mp3file, port=8000)
+    Server.play_file(zone, mp3file, port=8000)
 
 
     b.set_light("Hue color lamp 1", command)
