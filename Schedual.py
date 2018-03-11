@@ -25,3 +25,6 @@ def test():
             stop = 1
     time.sleep(5)
     house.stopServer()
+
+
+test()
