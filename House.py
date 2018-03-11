@@ -7,8 +7,10 @@ import os
 
 import soco
 from phue import Bridge
+from Server import HttpServer, detect_ip_address
 
-from collections import OrderedDict
+
+
 import json
 
 class CaseInsensitiveDict(dict):
@@ -46,7 +48,7 @@ class Brain(object):
 
         """
         # TODO:: send a message to the speakers to verify
-        cls.speakers = CaseInsensitiveDict((speaker.player_name, speaker) for speaker in list(soco.discover()))
+        cls.voice = list(soco.discover())[0].group.coordinator
 
         #cls.speakers = {speaker.player_name: speaker for speaker in list(soco.discover())}
 
@@ -69,7 +71,7 @@ class HouseAI(Brain):
     #resources
     #control time
 
-    # TODO:: Auto load devices by Zone name
+
     # TODO:: Create a metaclass to register created zones
     # TODO:: Auto load zone files
     # TODO:: Start HTTPS Server
@@ -82,7 +84,22 @@ class HouseAI(Brain):
         #list of zones
         self.zones = []
         #list of events
-        self.scheds =[]
+        self.scheds = []
+        self.setStorage()
+
+    @classmethod
+    def getVoice(self):
+        return self.voice
+
+    def startServer(self):
+        self.server = HttpServer(8000)
+        self.server.start()
+
+    def stopServer(self):
+        self.server.stop()
+
+    def getIp(self):
+        self.ip = detect_ip_address()
 
 
     def addZone(self, zone):
@@ -105,15 +122,16 @@ class HouseAI(Brain):
     def getLightNames(cls):
         return cls.lights.keys()
 
-    def startServer(self):
-        pass
 
-    def stopServer(self):
-        pass
 
     @classmethod
     def setStorage(cls):
-        cls.storage = os.path.join(os.getcwd(), "mp3")
+        path = os.path.join(os.getcwd(), "mp3")
+        if os.path.isdir(path):
+            cls.storage = path
+        else:
+            os.makedirs(path)
+            cls.storage = path
 
     @classmethod
     def getStorage(cls):
@@ -135,7 +153,7 @@ class Zone(HouseAI):
     # TODO:: finish up structure of zones
 
     def __init__(self, name):
-        super(Zone, self).__init__()
+        #super(Zone, self).__init__()
 
         self.data = {}
 
@@ -143,7 +161,7 @@ class Zone(HouseAI):
         self.data['devices'] = {'lights': [],
         'speakers': []}
 
-        self.autoLoad()
+        #self.autoLoad()
 
 
 
@@ -156,8 +174,9 @@ class Zone(HouseAI):
     def save(self):
         pass
 
-
-
+    @property
+    def speakers(self):
+        return self.data['devices']['speakers']
 
 
     def setName(self, name):
@@ -198,7 +217,7 @@ class Zone(HouseAI):
         print "autoloading"
         #todo :: handle multiple speakers and lights of multiple names
         self.addSpeaker( self.getName())
-        self.addSpeaker( self.getName())
+        self.addLight( self.getName())
 
 
         
