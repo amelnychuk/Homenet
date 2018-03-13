@@ -8,6 +8,8 @@ from oauth2client import tools
 from oauth2client.file import Storage
 
 import datetime
+from dateutil.parser import parse
+import pytz
 
 try:
     import argparse
@@ -52,7 +54,7 @@ def get_credentials():
     return credentials
 
 
-
+# TODO:: clean this function up
 def getEventData():
 
     #getCredentials
@@ -68,22 +70,33 @@ def getEventData():
             calendar_id = item['id']
     #calendar_list_entry = service.calendarList().get(calendarId='pcjici38do0gmr4pg4n6hb2u10@group.calendar.google.com').execute()
     #print calendar_list_entry
-    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+    now = datetime.datetime.now()  # 'Z' indicates UTC time
+    now = now.replace(hour=0, minute=0, second=0).isoformat() + 'Z'
+    print "now: ", now
     #getDayEvents
-    d = datetime.datetime.now()
-    d = d.replace(day=datetime.datetime.now().day+2)
+    d = datetime.datetime.utcnow()
+    #d = d.replace(day=datetime.datetime.now().day+2)
+    d = d.replace(hour=11, minute=59, second=59)
     tommorow = d.isoformat() + 'Z'
     #tommorow = datetime.datetime.now().replace(day=datetime.datetime.now().day+2).utcnow().isoformat() + 'Z'
-    print now
-    print tommorow
+    print "tommorow: ", tommorow
     eventsResult = service.events().list(
-        calendarId=calendar_id, timeMin=now, timeMax=tommorow,singleEvents=True,orderBy='startTime').execute()
+        calendarId=calendar_id, timeMin=now, timeMax=tommorow,singleEvents=True,timeZone="America/Los_Angeles",orderBy='startTime').execute()
     events = eventsResult.get('items', [])
     print events
     #get event colors
     eventcolors = service.colors().get().execute().get('event')
+    print events
+    timezone = pytz.timezone('America/Los_Angeles')
 
-    return [ (event['summary'], eventcolors[event['colorId']]['background']) for event in events]
-
+    for event in events:
+        start = parse(event['start']['dateTime'])
+        end = parse(event['end']['dateTime'])
+        print event['summary'], event['start']['dateTime'], event['end']['dateTime']
+        #print "parsedDate",  datetime.datetime.strptime(start,"%Y-%m-%dT%H:%M:%S")
+        sh, sm = start.hour, start.minute
+        eh, em = end.hour, end.minute
+        print "parsed: ", sh,sm,eh,em
+        #print "converted datetime", timezone.localize(datetime.datetime(event['start']['dateTime']))
 
 print getEventData()
