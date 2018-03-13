@@ -28,3 +28,23 @@ def test():
 
 
 test()
+def eventBeginSound(name):
+    return "{} has begun.".format(name)
+
+def eventProgress(name, time):
+    #percentage of time to time begin
+    percentage = None
+    return "It is {},{} is {} complete.".format(time,name, percentage)
+
+def eventWarning(name, time):
+    return "One minute left until the end of {}".format(name)
+
+def buildJob(name, start, end, scheduler):
+    Sound(name)
+
+
+
+def buildJobsFromCalendar():
+    pass
+    #get google data
+    #for each event
