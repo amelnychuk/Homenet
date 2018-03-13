@@ -1,15 +1,11 @@
 import os
 import re
 
-from soco import alarms
-import datetime
+
 from gtts import gTTS
-from House import HouseAI, Zone
+from House import HouseAI
 from Server import detect_ip_address
-import time
 
-
-import soco
 
 
 
@@ -49,25 +45,23 @@ class Light(Event):
         super(Light, self).__init__(time)
 
 
-class Sound(Event, HouseAI):
+class Sound(object):
     """
     Builds an alarm for sonos
     """
-    def __init__(self, time):
-        super(Sound, self).__init__(time)
-        self.startTime = time
-        #self.setService(service)
-        self.setAlarm()
-
-    def createDataDir(self):
-        pass
-
-    def setAlarm(self):
-
-        pass
+    def __init__(self, message):
+        self.msg = message
+        self.setVolume(50)
 
 
-    def buildMp3(self, msg):
+    def setVolume(self, vol):
+
+        self.volume = vol
+
+
+
+
+    def buildMp3(self):
         """
 
         Args:
@@ -81,7 +75,7 @@ class Sound(Event, HouseAI):
 
         filepath = os.path.join(HouseAI.getStorage(), "Notifications")
 
-        filename = "{0}.mp3".format(msg).replace(" ", "")
+        filename = "{0}.mp3".format(self.msg).replace(" ", "")
         pattern = re.compile('[\W_]+')
         pattern.sub('', filename)
 
@@ -91,21 +85,24 @@ class Sound(Event, HouseAI):
         outpath = os.path.join(filepath, filename)
 
         if not os.path.isfile(outpath):
-            speech = gTTS(text=msg, lang='en', slow=False)
+            speech = gTTS(text=self.msg, lang='en', slow=False)
             speech.save(savefile=outpath)
 
         self.soundFile = filename
-
-    def __call__(self):
-        print "Working"
-        self.play_file()
 
     def play_file(self, port=8000):
         netpath = 'http://{}:{}/{}'.format(detect_ip_address(), port, self.soundFile)
         print("netpath: ", netpath)
         z = HouseAI.getVoice()
-        z.volume = 60
+        z.volume = self.volume
         z.play_uri(uri=netpath)
+
+    def __call__(self):
+        self.buildMp3()
+        self.play_file()
+
+
+
 
 
 
