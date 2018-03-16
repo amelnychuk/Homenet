@@ -7,10 +7,9 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
-import datetime
+from datetime import datetime, timedelta
 from dateutil.parser import parse
-from dateutil import tz
-import pytz
+
 
 try:
     import argparse
@@ -29,6 +28,7 @@ class Calendar(object):
         self.setCalendarService()
         self.setCalendarIDs()
         self.setTimesOfDay()
+
 
     def setCalendarService(self):
         """Builds a google calendar service from
@@ -108,27 +108,30 @@ class Calendar(object):
             print "parsed: ", sh, sm, eh, em
             # print "converted datetime", timezone.localize(datetime.datetime(event['start']['dateTime']))
 
+
+
+
+
+
     def setTimesOfDay(self):
-        # TODO:: PRIORITY convert local start and end of day to utc
         """
         Day end and begin need in universal time
         Returns: beginning of day and end of day
 
+        querey format = 2018-03-14T17:00:00.000007Z
         """
-        from_zone = tz.gettz('UTC')
-        to_zone = tz.gettz('America/Los_Angeles')
-        day_begin = datetime.datetime.utcnow()  # 'Z' indicates UTC time
-        print parse(day_begin).astimezone(to_zone)
+        d_time = datetime.utcnow() - datetime.now()
+        today = datetime.now().date()  # 'Z' indicates UTC time
+        today = datetime(today.year, today.month, today.day,hour=0,minute=0,second=0)
 
-        day_begin = day_begin.replace(hour=0, minute=0, second=0).isoformat() + 'Z'
+        #start of day
+        start = today + d_time
+        #end of day
+        end = start + timedelta(.99)
 
-        day_end = datetime.datetime.utcnow()
+        self.day_begin = start.isoformat() + 'Z'
+        self.day_end = end.isoformat() + 'Z'
 
-        day_end = day_end.replace(hour=23, minute=59, second=59)
-        day_end = day_end.isoformat() + 'Z'
-
-        self.day_begin = day_begin
-        self.day_end = day_end
 
 
     def getEventColors(self):
@@ -138,4 +141,4 @@ class Calendar(object):
 
 
 C = Calendar()
-#C.getEventData('Routines')
+C.getEventData('Routine')
