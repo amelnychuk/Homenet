@@ -9,6 +9,10 @@ import soco
 from phue import Bridge
 from Server import HttpServer, detect_ip_address
 
+from Calendar import GoogleCalendar
+
+import schedule
+
 
 
 import json
@@ -47,10 +51,8 @@ class Brain(object):
         Finds all sonos speakers
 
         """
-        # TODO:: send a message to the speakers to verify
         cls.voice = list(soco.discover())[0].group.coordinator
 
-        #cls.speakers = {speaker.player_name: speaker for speaker in list(soco.discover())}
 
     @classmethod
     def hueDiscover(cls):
@@ -72,11 +74,6 @@ class HouseAI(Brain):
     #control time
 
 
-    # TODO:: Create a metaclass to register created zones
-    # TODO:: Auto load zone files
-    # TODO:: Start HTTPS Server
-    # TODO:: Scoop up schedual from google calendar
-
     def __init__(self):
         super(HouseAI, self).__init__()
         print "House"
@@ -86,10 +83,16 @@ class HouseAI(Brain):
         #list of events
         self.scheds = []
         self.setStorage()
+        self.Calendar = GoogleCalendar()
+        self.Schedule = schedule.Scheduler()
+
 
     @classmethod
     def getVoice(self):
         return self.voice
+
+    def getRoutine(self):
+        self.Calendar.getEventData('Routine')
 
     def startServer(self):
         self.server = HttpServer(8000)
@@ -150,7 +153,6 @@ class Zone(HouseAI):
     This has a collection of light and speaker names. Easily converts and loads json files.
     """
 
-    # TODO:: finish up structure of zones
 
     def __init__(self, name):
         #super(Zone, self).__init__()
@@ -215,7 +217,6 @@ class Zone(HouseAI):
 
     def autoLoad(self):
         print "autoloading"
-        #todo :: handle multiple speakers and lights of multiple names
         self.addSpeaker( self.getName())
         self.addLight( self.getName())
 
