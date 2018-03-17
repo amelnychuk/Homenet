@@ -81,9 +81,6 @@ class GoogleCalendar(object):
 
 
 
-
-
-
     def _setTimesOfDay(self):
         """
         Day end and begin need in universal time
@@ -117,7 +114,7 @@ class GoogleCalendar(object):
         except KeyError:
             print "Calendars are: "
             print self.calendarIDS.keys()
-            return None
+            return []
 
         events = self.service.events().list(
             calendarId=calendar_id,
@@ -137,7 +134,7 @@ class GoogleCalendar(object):
     def getEventColors(self):
         """
 
-        Returns: Google event colors in hexedecimal
+        Returns: Google event color palete
 
         """
         eventcolors = self.service.colors().get().execute().get('event')
