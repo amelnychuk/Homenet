@@ -11,6 +11,9 @@ import time
 import socket
 from threading import Thread
 from random import choice
+
+# TODO :: switch to https
+
 try:
     # Python 3
     from urllib.parse import quote
