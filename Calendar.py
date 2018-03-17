@@ -10,6 +10,8 @@ from oauth2client.file import Storage
 from datetime import datetime, timedelta
 from dateutil.parser import parse
 
+from Event import Event
+
 
 try:
     import argparse
@@ -23,15 +25,19 @@ SCOPES = 'https://www.googleapis.com/auth/calendar'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'CalandarLights'
 
-class Calendar(object):
+class GoogleCalendar(object):
+    """
+    Calendar object to retrieve google calendar data
+    """
     def __init__(self):
-        self.setCalendarService()
-        self.setCalendarIDs()
-        self.setTimesOfDay()
+        self._setCalendarService()
+        self._setCalendarIDs()
+        self._setTimesOfDay()
 
 
-    def setCalendarService(self):
-        """Builds a google calendar service from
+    def _setCalendarService(self):
+        """Builds a google calendar service.
+        Make sure your client_secret is in the same folder as this python file.
 
         Returns:
             Credentials, the obtained credential.
@@ -59,7 +65,7 @@ class Calendar(object):
         self.service = discovery.build('calendar', 'v3', http=http)
 
 
-    def setCalendarIDs(self):
+    def _setCalendarIDs(self):
         """
         Function to get different calendars
         Args:
@@ -73,6 +79,29 @@ class Calendar(object):
         calendar_list = self.service.calendarList().list(pageToken=page_token).execute()
         self.calendarIDS= {item['summary']: item['id'] for item in calendar_list.get('items', [])}
 
+
+
+
+
+
+    def _setTimesOfDay(self):
+        """
+        Day end and begin need in universal time
+        Returns: beginning of day and end of day
+
+        querey format = 2018-03-14T17:00:00.000007Z
+        """
+        d_time = datetime.utcnow() - datetime.now()
+        today = datetime.now().date()  # 'Z' indicates UTC time
+        today = datetime(today.year, today.month, today.day, hour=0, minute=0, second=0)
+
+        #start of day
+        start = today + d_time
+        #end of day
+        end = start + timedelta(.99)
+
+        self.day_begin = start.isoformat() + 'Z'
+        self.day_end = end.isoformat() + 'Z'
 
     def getEventData(self, calendarName):
         """
@@ -98,47 +127,20 @@ class Calendar(object):
             timeZone="America/Los_Angeles",
             orderBy='startTime').execute().get('items', [])
 
-        for event in events:
-            start = parse(event['start']['dateTime'])
-            end = parse(event['end']['dateTime'])
-            print event['summary'], event['start']['dateTime'], event['end']['dateTime']
-            # print "parsedDate",  datetime.datetime.strptime(start,"%Y-%m-%dT%H:%M:%S")
-            sh, sm = start.hour, start.minute
-            eh, em = end.hour, end.minute
-            print "parsed: ", sh, sm, eh, em
-            # print "converted datetime", timezone.localize(datetime.datetime(event['start']['dateTime']))
 
-
-
-
-
-
-    def setTimesOfDay(self):
-        """
-        Day end and begin need in universal time
-        Returns: beginning of day and end of day
-
-        querey format = 2018-03-14T17:00:00.000007Z
-        """
-        d_time = datetime.utcnow() - datetime.now()
-        today = datetime.now().date()  # 'Z' indicates UTC time
-        today = datetime(today.year, today.month, today.day,hour=0,minute=0,second=0)
-
-        #start of day
-        start = today + d_time
-        #end of day
-        end = start + timedelta(.99)
-
-        self.day_begin = start.isoformat() + 'Z'
-        self.day_end = end.isoformat() + 'Z'
+        return [Event(name=event['summary'],
+                      start=parse(event['start']['dateTime']),
+                      end=parse(event['end']['dateTime'])) for event in events]
 
 
 
     def getEventColors(self):
+        """
+
+        Returns: Google event colors in hexedecimal
+
+        """
         eventcolors = self.service.colors().get().execute().get('event')
         return eventcolors
 
 
-
-C = Calendar()
-C.getEventData('Routine')
