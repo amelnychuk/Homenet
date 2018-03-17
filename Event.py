@@ -37,7 +37,7 @@ class Event():
         self._end = end
 
     def __str__(self):
-        return "Poopy"
+        return "Event: {} starts at {} and ends at {}".format(self.name, self.start, self.end)
 
     def __repr__(self):
         return "<Event:{} at {} until {}>".format(self.name, self.start, self.end)
