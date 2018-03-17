@@ -1,9 +1,11 @@
 from House import HouseAI, Zone
-from Event import Sound
+from Sound import Sound
 
 import schedule
 import time
 import datetime
+
+from Calendar import GoogleCalendar
 
 def test():
     house = HouseAI()
@@ -25,6 +27,30 @@ def test():
             stop = 1
     time.sleep(5)
     house.stopServer()
+# TODO :: HIGHEST PRIORITY BUILD SCHEDULE, Say schedual at the beginning of the day
+# TODO :: HIGH Build sound task with multiple warnings of event
+# TODO :: Figure out structure of where scheduler lives inside of house.
+def test():
+    C = GoogleCalendar()
+
+    S = schedule.Scheduler()
+    events = C.getEventData('amelnychukoseen@gmail.com')
+    print events
+    for e in events:
+        print e
+        #build task
+        ##task = Sound(e.name)
+        #task.buildMp3()
+        #say what the events are.
+
+        #J = schedule.Job(1, scheduler=S)
+        #J.at(e.start).do(task)
+
+    #say how many events I have
+    #if event has location get google maps location data and get time
+
+
+
 
 
 test()
