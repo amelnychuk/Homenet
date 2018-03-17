@@ -29,10 +29,13 @@ class GoogleCalendar(object):
     """
     Calendar object to retrieve google calendar data
     """
-    def __init__(self):
+    def __init__(self, datetime=None):
+
+        self._datetime = datetime
         self._setCalendarService()
         self._setCalendarIDs()
         self._setTimesOfDay()
+
 
 
     def _setCalendarService(self):
@@ -89,8 +92,13 @@ class GoogleCalendar(object):
         querey format = 2018-03-14T17:00:00.000007Z
         """
         d_time = datetime.utcnow() - datetime.now()
-        today = datetime.now().date()  # 'Z' indicates UTC time
-        today = datetime(today.year, today.month, today.day, hour=0, minute=0, second=0)
+        today = datetime.now()  # 'Z' indicates UTC time
+        if not self._datetime:
+            today = today.date()
+            today = datetime(today.year, today.month, today.day, hour=0, minute=0, second=0)
+        else:
+            today = self._datetime
+
 
         #start of day
         start = today + d_time
