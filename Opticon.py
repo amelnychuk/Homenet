@@ -1,6 +1,7 @@
 
 
 from House import HouseAI, Zone
+from Calendar import GoogleCalendar as C
 
 
 def livingRoom():
@@ -12,11 +13,16 @@ def livingRoom():
 def main():
     print "starting House"
     House = HouseAI()
-    House.addZone(livingRoom())
-    # todo:: add scheduler for events
 
-    print House.getSpeakerNames()
-    print House.getLightNames()
+    #House.addZone(livingRoom())
+    # todo:: add scheduler for events
+    # todo:: schedule collection of google calendar events
+
+
+
+
+    #print House.getSpeakerNames()
+    #print House.getLightNames()
 
 
 
