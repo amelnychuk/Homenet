@@ -1,41 +1,47 @@
-import os
-import re
 
-
-from gtts import gTTS
-from House import HouseAI
-from Server import detect_ip_address
-
-
-
+from datetime import datetime
 
 class Event():
-    def __init__(self, time):
-        pass
+    """
+    Class to process google calendar events
+    """
 
-    def setTime(self,time):
-        self._time = time
+    def __init__(self, name='None', start=datetime.now(), end = datetime.now()):
+        self._name = name
+        self._start = start
+        self._end = end
 
-    def getTime(self):
-        return self._time
+    @property
+    def name(self):
+        return self._name
 
-    def setZone(self, zone):
-        self._zone = zone
+    @name.setter
+    def name(self, name):
+        self._name = name
 
-    def getZone(self):
-        return self._zone
+    @property
+    def start(self):
+        return "{}:{}".format(self._start.hour, str(self._start.minute).zfill(2))
 
-    def add(self):
-        pass
 
-    def remove(self):
-        pass
+    @start.setter
+    def start(self, start):
+        self._start = start
 
-    def setStart(self):
-        pass
+    @property
+    def end(self):
+        return "{}:{}".format(self._end.hour, str(self._end.minute).zfill(2))
 
-    def setEnd(self):
-        pass
+    @end.setter
+    def end(self, end):
+        self._end = end
+
+    def __str__(self):
+        return "Poopy"
+
+    def __repr__(self):
+        return "<Event:{} at {} until {}>".format(self.name, self.start, self.end)
+
 
 
 class Light(Event):
@@ -45,61 +51,6 @@ class Light(Event):
         super(Light, self).__init__(time)
 
 
-class Sound(object):
-    """
-    Builds an alarm for sonos
-    """
-    def __init__(self, message):
-        self.msg = message
-        self.setVolume(50)
-
-
-    def setVolume(self, vol):
-
-        self.volume = vol
-
-
-
-
-    def buildMp3(self):
-        """
-
-        Args:
-            msg: (str) converts text to mp3 and saves it to disk
-
-        Returns:
-
-        """
-
-
-
-        filepath = os.path.join(HouseAI.getStorage(), "Notifications")
-
-        filename = "{0}.mp3".format(self.msg).replace(" ", "")
-        pattern = re.compile('[\W_]+')
-        pattern.sub('', filename)
-
-        if not os.path.isdir(filepath):
-            os.makedirs(filepath)
-
-        outpath = os.path.join(filepath, filename)
-
-        if not os.path.isfile(outpath):
-            speech = gTTS(text=self.msg, lang='en', slow=False)
-            speech.save(savefile=outpath)
-
-        self.soundFile = filename
-
-    def play_file(self, port=8000):
-        netpath = 'http://{}:{}/{}'.format(detect_ip_address(), port, self.soundFile)
-        print("netpath: ", netpath)
-        z = HouseAI.getVoice()
-        z.volume = self.volume
-        z.play_uri(uri=netpath)
-
-    def __call__(self):
-        self.buildMp3()
-        self.play_file()
 
 
 
