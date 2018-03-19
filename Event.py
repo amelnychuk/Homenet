@@ -19,28 +19,33 @@ class Event():
     def name(self, name):
         self._name = name
 
-    @property
-    def start(self):
-        return "{}:{}".format(self._start.hour, str(self._start.minute).zfill(2))
+
+    def getStart(self, str=True):
+        if str:
+            return "{}:{}".format(self._start.hour, str(self._start.minute).zfill(2))
+        else:
+            return self._start
 
 
-    @start.setter
-    def start(self, start):
+    def setStart(self, start):
         self._start = start
 
-    @property
-    def end(self):
-        return "{}:{}".format(self._end.hour, str(self._end.minute).zfill(2))
 
-    @end.setter
-    def end(self, end):
+    def getEnd(self, str=True):
+        if str:
+            return "{}:{}".format(self._end.hour, str(self._end.minute).zfill(2))
+        else:
+            return self._end
+
+
+    def setEnd(self, end):
         self._end = end
 
     def __str__(self):
-        return "Event: {} starts at {} and ends at {}".format(self.name, self.start, self.end)
+        return "Event: {} starts at {} and ends at {}".format(self.name, self.getStart(str=True), self.getEnd(str=True))
 
     def __repr__(self):
-        return "<Event:{} at {} until {}>".format(self.name, self.start, self.end)
+        return "<Event:{} at {} until {}>".format(self.name, self.getStart(str=True), self.getEnd(str=True))
 
 
 
