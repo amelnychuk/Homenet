@@ -86,13 +86,19 @@ class HouseAI(Brain):
         self.Calendar = GoogleCalendar()
         self.Schedule = schedule.Scheduler()
 
+    def calendarEventsToReminders(self):
+        #TODO: collect event data at beginning of day and
+        job = schedule.Job(interval=2, scheduler=self.Schedule)
+        job.at("6:50").do(self.getRoutine)
+
 
     @classmethod
     def getVoice(self):
         return self.voice
 
     def getRoutine(self):
-        self.Calendar.getEventData('Routine')
+        #TODO: convert calendar events into scheule.jobs
+        routines = self.Calendar.getEventData('Routine')
 
     def startServer(self):
         self.server = HttpServer(8000)
