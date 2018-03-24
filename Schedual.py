@@ -1,9 +1,10 @@
 from House import HouseAI, Zone
 from Sound import Sound
+from Event import Event
 
 import schedule
 import time
-import datetime
+from datetime import datetime, timedelta
 
 from Calendar import GoogleCalendar
 
@@ -14,7 +15,7 @@ def test():
     s = Sound("10:30")
     s.buildMp3("Test")
 
-    start = datetime.datetime.now()
+    start = datetime.now()
     t = "{}:{}".format(start.hour, start.minute + 1)
     schedule.every().sunday.at(t).do(s)
 
@@ -23,7 +24,7 @@ def test():
     stop = 0
     while not stop:
         schedule.run_pending()
-        if datetime.datetime.now().minute == start.minute + 2:
+        if datetime.now().minute == start.minute + 2:
             stop = 1
     time.sleep(5)
     house.stopServer()
@@ -54,6 +55,52 @@ def test():
 
 
 test()
+#for each event
+
+#make a warning for beginning and next event
+#announce begin/start
+#annouce 25,50,75 completion if event is over 30 mins
+
+#inherit from event?
+class Announcement(Event):
+    def __init__(self, time, scheduler, start=datetime.now(), end = datetime.now()):
+        super(Event, self).__init__(time, start=start, end=end)
+        self._scheduler = scheduler
+        self.startWarning(minutes=5)
+        self.startWarning(minutes=1)
+
+
+
+    def makeSound(self):
+        pass
+
+    def startWarning(self, minutes=1):
+        td = timedelta(minutes=minutes)
+        starttime = self.getStart() - td
+        msg = "5 minutes until {} begins".format(self.name)
+        announcement = Sound(msg)
+        Job = schedule.Job(interval=2, schedule = self._scheduler)
+        str_time = "{}:{}".format(starttime.hour, starttime.minute)
+        Job.at(str_time).do(announcement)
+
+    def progress(self):
+        """
+        If event is longer than one hour create progress announcement jobs for scheduler
+        :return:
+        """
+        duration = self.getEnd(str=False) - self.getStart(str=False)
+        if duration.hour > 1:
+            #create time at 25,50 and 75% progress
+            duration * .25
+            for i in range(3):
+                newtime = duration * .25 * i
+                newtime = self.getStart + duration
+                #make job at time
+
+
+
+
+
 def eventBeginSound(name):
     return "{} has begun.".format(name)
 
@@ -63,7 +110,8 @@ def eventProgress(name, time):
     return "It is {},{} is {} complete.".format(time,name, percentage)
 
 def eventWarning(name, time):
-    return "One minute left until the end of {}".format(name)
+    Sound( "One minute left until the end of {}".format(name))
+
 
 def buildJob(name, start, end, scheduler):
     Sound(name)
