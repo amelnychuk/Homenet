@@ -10,6 +10,7 @@ from phue import Bridge
 from Server import HttpServer, detect_ip_address
 
 from Calendar import GoogleCalendar
+from Sound import Sound
 
 import schedule
 
@@ -86,10 +87,28 @@ class HouseAI(Brain):
         self.Calendar = GoogleCalendar()
         self.Schedule = schedule.Scheduler()
 
+        #dictionary of sound objects
+        self.announcements = {}
+
     def calendarEventsToReminders(self):
         #TODO: collect event data at beginning of day and
         job = schedule.Job(interval=2, scheduler=self.Schedule)
         job.at("6:50").do(self.getRoutine)
+
+
+
+    def eventConvert(self):
+
+        jobs = []
+        self.Sounds = {}
+        for routine in self.routines:
+
+            announcement = Sound(routine.name)
+
+            Sound = self.announcements.setdefault(routine.name, announcement)
+
+            job = schedule.Job(inteval=2, scheduler=self.Schedule)
+            job.at(routine.start).do(self.announcements[routine.name])
 
 
     @classmethod
@@ -97,8 +116,7 @@ class HouseAI(Brain):
         return self.voice
 
     def getRoutine(self):
-        #TODO: convert calendar events into scheule.jobs
-        routines = self.Calendar.getEventData('Routine')
+        self.routines = self.Calendar.getEventData('Routine')
 
     def startServer(self):
         self.server = HttpServer(8000)
