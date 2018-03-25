@@ -1,18 +1,31 @@
 
 
-from House import HouseAI, Zone
-from Calendar import GoogleCalendar as C
+from House import HouseAI
+from Schedual import Announcement
+
+from datetime import datetime, timedelta
+import time
 
 
-def livingRoom():
-    livingRoom = Zone("Living Room")
-    print livingRoom.asJson()
-    return livingRoom
 
 
 def main():
     print "starting House"
     House = HouseAI()
+
+    start  = datetime.now() + timedelta(seconds=10)
+    end = start + timedelta(minutes=5)
+
+    A = Announcement(name="MyTest", start=start, end=end, scheduler=House.schedule)
+    stop = 0
+    while not stop:
+        House.schedule.run_pending()
+        if datetime.now().minute == A.getEnd(str=False).minute + 2:
+            stop = 1
+    time.sleep(5)
+
+    print "Stoping server..."
+    House.stopServer()
 
     #House.addZone(livingRoom())
     # todo:: add scheduler for events
