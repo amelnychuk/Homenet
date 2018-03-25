@@ -91,7 +91,7 @@ class GoogleCalendar(object):
         querey format = 2018-03-14T17:00:00.000007Z
         """
         d_time = datetime.utcnow() - datetime.now()
-        today = datetime.now()  # 'Z' indicates UTC time
+        today = datetime.now()
         if not self._datetime:
             today = today.date()
             today = datetime(today.year, today.month, today.day, hour=0, minute=0, second=0)
