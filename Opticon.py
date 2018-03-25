@@ -1,7 +1,7 @@
 
 
 from House import HouseAI
-from Schedual import Announcement
+from Annoucement import Announcement
 
 from datetime import datetime, timedelta
 import time
@@ -12,10 +12,15 @@ import time
 def main():
     print "starting House"
     House = HouseAI()
+    #House.getRoutine(name='amelnychukoseen@gmail.com')
+    ed = House.Calendar.getEventData('amelnychukoseen@gmail.com')
+    print ed
+    print type(ed[0].getStart())
+    House.stopServer()
 
-    start  = datetime.now() + timedelta(seconds=10)
-    end = start + timedelta(minutes=5)
-
+    #start  = datetime.now() + timedelta(seconds=10)
+    #end = start + timedelta(minutes=5)
+"""
     A = Announcement(name="MyTest", start=start, end=end, scheduler=House.schedule)
     stop = 0
     while not stop:
@@ -30,7 +35,7 @@ def main():
     #House.addZone(livingRoom())
     # todo:: add scheduler for events
     # todo:: schedule collection of google calendar events
-
+"""
 
 
 
