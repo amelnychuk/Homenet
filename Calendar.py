@@ -53,7 +53,6 @@ class GoogleCalendar(object):
                                        'client_secret.json')
 
         store = Storage(credential_path)
-        print (store)
         credentials = store.get()
         if not credentials or credentials.invalid:
             flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
