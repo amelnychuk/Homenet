@@ -1,7 +1,7 @@
 
 from datetime import datetime
 
-class Event():
+class Event(object):
     """
     Class to process google calendar events
     """
@@ -20,7 +20,7 @@ class Event():
         self._name = name
 
 
-    def getStart(self, str=True):
+    def getStart(self, str=False):
         if str:
             return "{}:{}".format(self._start.hour, str(self._start.minute).zfill(2))
         else:
@@ -31,7 +31,7 @@ class Event():
         self._start = start
 
 
-    def getEnd(self, str=True):
+    def getEnd(self, str=False):
         if str:
             return "{}:{}".format(self._end.hour, str(self._end.minute).zfill(2))
         else:
