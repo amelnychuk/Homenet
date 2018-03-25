@@ -1,5 +1,9 @@
-
+from House import HouseAI
 from datetime import datetime
+
+#Build in casting to children objects
+#Build a child registry
+
 
 class Event(object):
     """
@@ -10,6 +14,9 @@ class Event(object):
         self._name = name
         self._start = start
         self._end = end
+        self._scheduler = HouseAI.getScheduler()
+        self._first = False
+        self._nextEvent = None
 
     @property
     def name(self):
@@ -40,6 +47,12 @@ class Event(object):
 
     def setEnd(self, end):
         self._end = end
+
+    def cast(self, eventClass):
+        eventClass = eventClass()
+        for attr_name in self.__class__.__dict__:
+            setattr(eventClass, attr_name, getattr(eventClass, attr_name))
+        return eventClass
 
     def __str__(self):
         return "Event: {} starts at {} and ends at {}".format(self.name, self.getStart(asDateTime=False), self.getEnd(asDateTime=False))
