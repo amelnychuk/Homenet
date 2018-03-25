@@ -1,0 +1,5 @@
+soco==0.14
+phue==1.0
+googleapiclient==1.6.5
+gtts>=1.2.2
+schedule
