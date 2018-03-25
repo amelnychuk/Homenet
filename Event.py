@@ -20,32 +20,32 @@ class Event(object):
         self._name = name
 
 
-    def getStart(self, asDateTime=False):
+    def getStart(self, asDateTime=True):
         if asDateTime:
-            return "{}:{}".format(self._start.hour, str(self._start.minute).zfill(2))
-        else:
             return self._start
+        else:
+            return "{}:{}".format(self._start.hour, str(self._start.minute).zfill(2))
 
 
     def setStart(self, start):
         self._start = start
 
 
-    def getEnd(self, asDateTime=False):
+    def getEnd(self, asDateTime=True):
         if asDateTime:
-            return "{}:{}".format(self._end.hour, str(self._end.minute).zfill(2))
-        else:
             return self._end
+        else:
+            return "{}:{}".format(self._end.hour, str(self._end.minute).zfill(2))
 
 
     def setEnd(self, end):
         self._end = end
 
     def __str__(self):
-        return "Event: {} starts at {} and ends at {}".format(self.name, self.getStart(), self.getEnd())
+        return "Event: {} starts at {} and ends at {}".format(self.name, self.getStart(asDateTime=False), self.getEnd(asDateTime=False))
 
     def __repr__(self):
-        return "<Event:{} at {} until {}>".format(self.name, self.getStart(), self.getEnd())
+        return "<Event:{} at {} until {}>".format(self.name, self.getStart(asDateTime=False), self.getEnd(asDateTime=False))
 
 
 
