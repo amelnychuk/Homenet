@@ -43,7 +43,8 @@ class Brain(object):
     def __init__(self):
         print "Discovering devices..."
         self.speakerDiscover()
-        self.hueDiscover()
+        #self.hueDiscover()
+        self.startScheduler()
 
     @classmethod
     def speakerDiscover(cls):
@@ -68,10 +69,18 @@ class Brain(object):
         cls.lights = CaseInsensitiveDict((light.name, light) for light in bridge.get_light_objects())
 
     @classmethod
-    def getVoice(self):
-        return self.voice
+    def getVoice(cls):
+        return cls.voice
 
-    # TODO :: Maybe move scheduler into class object
+
+    @classmethod
+    def startScheduler(cls):
+        print "Creating Scheduler"
+        cls.scheduler = schedule.Scheduler()
+
+    @classmethod
+    def getScheduler(cls):
+        return cls.scheduler
 
 
 
@@ -93,8 +102,6 @@ class HouseAI(Brain):
 
         self.startCalendar()
 
-        self.startScheduler()
-
 
         #start server
         self.startServer()
@@ -103,7 +110,6 @@ class HouseAI(Brain):
         self.announcements = {}
 
     def calendarEventsToReminders(self):
-        #TODO: collect event data at beginning of day and
         job = schedule.Job(interval=2, scheduler=self.Schedule)
         job.at("6:50").do(self.getRoutine)
 
@@ -127,9 +133,7 @@ class HouseAI(Brain):
 
     #schedule commands
 
-    def startScheduler(self):
-        print "Creating Scheduler"
-        self.schedule = schedule.Scheduler()
+
 
     #Calendar commands
 
@@ -137,8 +141,12 @@ class HouseAI(Brain):
         print "Getting google calendar"
         self.Calendar = GoogleCalendar()
 
-    def getRoutine(self):
-        self.routines = self.Calendar.getEventData('Routine')
+    def getRoutine(self, name='Routine'):
+        self.routines = self.Calendar.getEventData(name)
+
+    def printRoutines(self):
+        for r in self.routines:
+            print r
 
     #Server commands
 
@@ -178,7 +186,7 @@ class HouseAI(Brain):
 
     @classmethod
     def setStorage(cls):
-        path = os.path.join(os.getcwd(), "mp3")
+        path = os.path.join(os.getcwd(), "mp3/Notifications")
         if os.path.isdir(path):
             cls.storage = path
         else:
