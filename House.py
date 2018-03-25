@@ -10,7 +10,7 @@ from phue import Bridge
 from Server import HttpServer, detect_ip_address
 
 from Calendar import GoogleCalendar
-from Sound import Sound
+
 
 import schedule
 
@@ -41,7 +41,7 @@ class Brain(object):
     """
     # TODO :: generalize data structure to handle all different types of devices
     def __init__(self):
-        print "Discover"
+        print "Discovering devices..."
         self.speakerDiscover()
         self.hueDiscover()
 
@@ -67,6 +67,12 @@ class Brain(object):
         # TODO :: Varification of lights
         cls.lights = CaseInsensitiveDict((light.name, light) for light in bridge.get_light_objects())
 
+    @classmethod
+    def getVoice(self):
+        return self.voice
+
+    # TODO :: Maybe move scheduler into class object
+
 
 
 class HouseAI(Brain):
@@ -77,15 +83,21 @@ class HouseAI(Brain):
 
     def __init__(self):
         super(HouseAI, self).__init__()
-        print "House"
+        print "Initializing House AI"
         #these might be sets
         #list of zones
         self.zones = []
         #list of events
         self.scheds = []
         self.setStorage()
-        self.Calendar = GoogleCalendar()
-        self.Schedule = schedule.Scheduler()
+
+        self.startCalendar()
+
+        self.startScheduler()
+
+
+        #start server
+        self.startServer()
 
         #dictionary of sound objects
         self.announcements = {}
@@ -111,14 +123,27 @@ class HouseAI(Brain):
             job.at(routine.start).do(self.announcements[routine.name])
 
 
-    @classmethod
-    def getVoice(self):
-        return self.voice
+
+
+    #schedule commands
+
+    def startScheduler(self):
+        print "Creating Scheduler"
+        self.schedule = schedule.Scheduler()
+
+    #Calendar commands
+
+    def startCalendar(self):
+        print "Getting google calendar"
+        self.Calendar = GoogleCalendar()
 
     def getRoutine(self):
         self.routines = self.Calendar.getEventData('Routine')
 
+    #Server commands
+
     def startServer(self):
+        print "Creating Http server...."
         self.server = HttpServer(8000)
         self.server.start()
 
