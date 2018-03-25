@@ -6,7 +6,7 @@ class Event(object):
     Class to process google calendar events
     """
 
-    def __init__(self, name='None', start=datetime.now(), end = datetime.now()):
+    def __init__(self, name='None', start=datetime.now(), end=datetime.now()):
         self._name = name
         self._start = start
         self._end = end
@@ -20,8 +20,8 @@ class Event(object):
         self._name = name
 
 
-    def getStart(self, str=False):
-        if str:
+    def getStart(self, asDateTime=False):
+        if asDateTime:
             return "{}:{}".format(self._start.hour, str(self._start.minute).zfill(2))
         else:
             return self._start
@@ -31,8 +31,8 @@ class Event(object):
         self._start = start
 
 
-    def getEnd(self, str=False):
-        if str:
+    def getEnd(self, asDateTime=False):
+        if asDateTime:
             return "{}:{}".format(self._end.hour, str(self._end.minute).zfill(2))
         else:
             return self._end
@@ -42,10 +42,10 @@ class Event(object):
         self._end = end
 
     def __str__(self):
-        return "Event: {} starts at {} and ends at {}".format(self.name, self.getStart(str=True), self.getEnd(str=True))
+        return "Event: {} starts at {} and ends at {}".format(self.name, self.getStart(), self.getEnd())
 
     def __repr__(self):
-        return "<Event:{} at {} until {}>".format(self.name, self.getStart(str=True), self.getEnd(str=True))
+        return "<Event:{} at {} until {}>".format(self.name, self.getStart(), self.getEnd())
 
 
 
