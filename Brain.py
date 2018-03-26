@@ -28,7 +28,13 @@ class CaseInsensitiveDict(dict):
             v = super(CaseInsensitiveDict, self).pop(k)
             self.__setitem__(k, v)
 
-
+def setStorage():
+    path = os.path.join(os.getcwd(), "mp3/Notifications")
+    if os.path.isdir(path):
+        return path
+    else:
+        os.makedirs(path)
+        return path
 
 class Brain(object):
     """
@@ -37,12 +43,15 @@ class Brain(object):
 
     """
 
-    # TODO:: Add server and storage to Brain
+    scheduler = schedule.Scheduler()
+    storage = setStorage()
+
     def __init__(self):
         print "Discovering devices..."
         self.speakerDiscover()
+
         #self.hueDiscover()
-        self.startScheduler()
+        #self.startScheduler()
 
     @classmethod
     def speakerDiscover(cls):
@@ -80,13 +89,9 @@ class Brain(object):
         return cls.scheduler
 
     @classmethod
-    def setStorage(cls):
-        path = os.path.join(os.getcwd(), "mp3/Notifications")
-        if os.path.isdir(path):
-            cls.storage = path
-        else:
-            os.makedirs(path)
-            cls.storage = path
+
+
+
 
     @classmethod
     def getStorage(cls):

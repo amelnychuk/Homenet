@@ -1,4 +1,4 @@
-from House import HouseAI
+from Brain import Brain
 from datetime import datetime
 
 #Build in casting to children objects
@@ -10,13 +10,14 @@ class Event(object):
     Class to process google calendar events
     """
 
-    def __init__(self, name='None', start=datetime.now(), end=datetime.now()):
+    def __init__(self, name='None', start=datetime.now(), end=datetime.now(), index=None):
         self._name = name
         self._start = start
         self._end = end
-        self._scheduler = HouseAI.getScheduler()
-        self._first = False
-        self._nextEvent = None
+        self._scheduler = Brain.getScheduler()
+        self._index = index
+
+
 
     @property
     def name(self):
@@ -47,6 +48,9 @@ class Event(object):
 
     def setEnd(self, end):
         self._end = end
+
+    def getIndex(self):
+        return self._index
 
     def cast(self, eventClass):
         eventClass = eventClass()

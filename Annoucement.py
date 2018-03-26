@@ -4,23 +4,21 @@ from Event import Event
 from Sound import Sound
 
 
+
 import schedule
 import time
 from datetime import datetime, timedelta
 
 
-#for each event
 
-#make a warning for beginning and next event
-#announce begin/start
-#annouce 25,50,75 completion if event is over 30 mins
-
-#inherit from event?
 class Announcement(Event):
     def __init__(self, name='None', start=datetime.now(), end = datetime.now(), EventObj = None):
 
         if isinstance(EventObj, Event):
-            super(Announcement, self).__init__(name=EventObj.name, start=EventObj.getStart(), end=EventObj.getEnd())
+            super(Announcement, self).__init__(name=EventObj.name,
+                                               start=EventObj.getStart(),
+                                               end=EventObj.getEnd(),
+                                               index=EventObj.getIndex())
         else:
             super(Announcement, self).__init__(name=name, start=start, end=end)
 

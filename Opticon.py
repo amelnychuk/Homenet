@@ -10,12 +10,17 @@ import time
 
 
 def main():
+    ## TODO: Convert
     print "starting House"
     House = HouseAI()
     #House.getRoutine(name='amelnychukoseen@gmail.com')
-    ed = House.Calendar.getEventData('amelnychukoseen@gmail.com')
+    House.Calendar.getEventData('amelnychukoseen@gmail.com')
+    ed = House.Calendar.getEvents('amelnychukoseen@gmail.com')
     print ed
-    print type(ed[0].getStart())
+    print type(ed[0])
+    #Todo :: fix initializeing of events to build annoucement jobs
+    ed[0] = ed[0].cast(Announcement)
+    print ed[0]
     House.stopServer()
 
     #start  = datetime.now() + timedelta(seconds=10)

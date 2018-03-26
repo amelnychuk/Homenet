@@ -1,7 +1,7 @@
 import os
 import re
 
-from House import HouseAI
+from Brain import Brain
 from Server import detect_ip_address
 
 from gtts import gTTS
@@ -34,7 +34,7 @@ class Sound(object):
 
 
 
-        filepath = os.path.join(HouseAI.getStorage(), "Notifications")
+        filepath = os.path.join(Brain.storage, "Notifications")
 
         filename = "{0}.mp3".format(self.msg).replace(" ", "")
         pattern = re.compile('[\W_]+')
@@ -54,7 +54,7 @@ class Sound(object):
     def play_file(self, port=8000):
         netpath = 'http://{}:{}/{}'.format(detect_ip_address(), port, self.soundFile)
         print("netpath: ", netpath)
-        z = HouseAI.getVoice()
+        z = Brain.getVoice()
         z.volume = self.volume
         z.play_uri(uri=netpath)
 

@@ -13,6 +13,8 @@ from dateutil.parser import parse
 from Event import Event
 
 
+
+
 try:
     import argparse
     flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
@@ -35,6 +37,8 @@ class GoogleCalendar(object):
         self._setCalendarService()
         self._setCalendarIDs()
         self._setTimesOfDay()
+
+        self._events = {}
 
 
 
@@ -107,21 +111,37 @@ class GoogleCalendar(object):
         self.day_begin = start.isoformat() + 'Z'
         self.day_end = end.isoformat() + 'Z'
 
-    def getEventData(self, calendarName):
+    def calendarNameToID(self, calendarname):
         """
-        Gets the events from your calendar.
+        Converts calendar name into a calendar id
+        Args:
+        :param calendarname:
+            name of the google calendar
+        :return:
+            google calendar id
+        """
+
+        try:
+            calendar_id = self.calendarIDS[calendarname]
+            return calendar_id
+        except KeyError:
+            print "Calendars are: "
+            print self.calendarIDS.keys()
+            return None
+
+
+    def getEventData(self, calendarname):
+        """
+        Gets the events from your calendar. Stores in a dictionary by calendar name
         Args:
             calendar_id:  Google calendar id
 
         Returns:
 
         """
-        try:
-            calendar_id = self.calendarIDS[calendarName]
-        except KeyError:
-            print "Calendars are: "
-            print self.calendarIDS.keys()
-            return []
+        calendar_id = self.calendarNameToID(calendarname)
+        if not calendar_id:
+            return
 
         events = self.service.events().list(
             calendarId=calendar_id,
@@ -132,10 +152,26 @@ class GoogleCalendar(object):
             orderBy='startTime').execute().get('items', [])
 
 
-        return [Event(name=event['summary'],
-                      start=parse(event['start']['dateTime']),
-                      end=parse(event['end']['dateTime'])) for event in events]
+        events = [Event(name=event['summary'],
+                        start=parse(event['start']['dateTime']),
+                        end=parse(event['end']['dateTime']),
+                        index=i) for i, event in enumerate(events)]
 
+        self._events.setdefault(calendarname, events)
+
+    def getEvents(self, calendarname):
+        """
+
+        :param calendarname:
+            name of calendar
+        :return:
+            array of Event objects
+        """
+
+        try:
+            return self._events[calendarname]
+        except KeyError:
+            return None
 
 
     def getEventColors(self):
