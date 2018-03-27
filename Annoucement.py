@@ -15,29 +15,31 @@ class Announcement(Event):
     def __init__(self, name='None', start=datetime.now(), end = datetime.now(), EventObj = None):
 
         if isinstance(EventObj, Event):
-            super(Announcement, self).__init__(name=EventObj.name,
+            super(Announcement, self).__init__(name=EventObj.getName(),
                                                start=EventObj.getStart(),
                                                end=EventObj.getEnd(),
                                                index=EventObj.getIndex())
         else:
-            super(Announcement, self).__init__(name=name, start=start, end=end)
+            super(Announcement, self).__init__(name=name, start=start, end=end, index=None)
+
 
         self.announcements()
 
 
 
     def begin(self):
-        msg = "Human, it is time to begin {}.".format(self.name)
+        print
+        msg = "It is time to begin {}.".format(self.getName())
         self.makeJob(msg, self.getStart())
 
     def warning(self, minutes):
 
 
         if minutes > 1:
-            msg = "{} minute until next event."
-        else:
             msg = "{} minutes until next event"
-        msg.format(minutes)
+        else:
+            msg = "{} minute until next event"
+        msg = msg.format(minutes)
 
         td = timedelta(minutes=minutes)
         start = self.getEnd() - td
@@ -52,7 +54,7 @@ class Announcement(Event):
                 newtime = duration * (i / float(amount))
                 newtime = self.getStart() + newtime
 
-                msg = "{} is {} percent complete".format(self.name, (i/float(amount)) * 100)
+                msg = "{} is {} percent complete".format(self._name, (i/float(amount)) * 100)
 
                 self.makeJob(msg, newtime)
 
@@ -62,19 +64,26 @@ class Announcement(Event):
     def makeJob(self, msg, start):
 
         announce = Sound(msg)
-        announce.buildMp3()
+        #announce.buildMp3()
+        announce()
 
-        Job = schedule.Job(interval=1, scheduler=self._scheduler)
-        Job.unit = 'days'
-        str_time = "{}:{}".format(start.hour, start.minute)
-        print "Starting warning at: ", str_time
-        Job.at(str_time).do(announce)
+        #Job = schedule.Job(interval=1, scheduler=self._scheduler)
+        #Job.unit = 'days'
+        #str_time = "{}:{}".format(start.hour, start.minute)
+        #print "Starting warning at: ", str_time
+        #Job.at(str_time).do(announce)
 
     def announcements(self):
         self.begin()
         self.warning(minutes=5)
         self.warning(minutes=1)
-        self.progress()
+        #self.progress()
+
+    def __str__(self):
+        return "Announce: {} starts at {} and ends at {}".format(self.name, self.getStart(asDateTime=False), self.getEnd(asDateTime=False))
+
+    def __repr__(self):
+        return "<Announce:{} at {} until {}>".format(self.name, self.getStart(asDateTime=False), self.getEnd(asDateTime=False))
 
 
 

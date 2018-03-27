@@ -6,6 +6,8 @@ from Server import detect_ip_address
 
 from gtts import gTTS
 
+import time
+
 class Sound(object):
     """
     Builds an alarm for sonos
@@ -35,6 +37,8 @@ class Sound(object):
 
 
         filepath = os.path.join(Brain.storage, "Notifications")
+        if not os.path.exists(filepath):
+            os.makedirs(filepath)
 
         filename = "{0}.mp3".format(self.msg).replace(" ", "")
         pattern = re.compile('[\W_]+')
@@ -54,9 +58,11 @@ class Sound(object):
     def play_file(self, port=8000):
         netpath = 'http://{}:{}/{}'.format(detect_ip_address(), port, self.soundFile)
         print("netpath: ", netpath)
-        z = Brain.getVoice()
+
+        z = Brain.voice
         z.volume = self.volume
         z.play_uri(uri=netpath)
+        time.sleep(3)
 
     def __call__(self):
         self.buildMp3()

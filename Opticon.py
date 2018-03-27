@@ -14,13 +14,18 @@ def main():
     print "starting House"
     House = HouseAI()
     #House.getRoutine(name='amelnychukoseen@gmail.com')
-    House.Calendar.getEventData('amelnychukoseen@gmail.com')
-    ed = House.Calendar.getEvents('amelnychukoseen@gmail.com')
-    print ed
-    print type(ed[0])
+    House.Calendar.getEventData('Routine')
+    ed = House.Calendar.getEvents('Routine')
+    print "name: ", ed[0].getName()
+    A = Announcement(ed[0])
+
+    #todo convert to announcements and build
+    #todo build job to collect information every day
+    #todo run this on different computer
+
+    print
     #Todo :: fix initializeing of events to build annoucement jobs
-    ed[0] = ed[0].cast(Announcement)
-    print ed[0]
+
     House.stopServer()
 
     #start  = datetime.now() + timedelta(seconds=10)

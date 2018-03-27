@@ -29,7 +29,7 @@ class CaseInsensitiveDict(dict):
             self.__setitem__(k, v)
 
 def setStorage():
-    path = os.path.join(os.getcwd(), "mp3/Notifications")
+    path = os.path.join(os.getcwd(), "mp3")
     if os.path.isdir(path):
         return path
     else:
@@ -45,10 +45,11 @@ class Brain(object):
 
     scheduler = schedule.Scheduler()
     storage = setStorage()
+    voice = list(soco.discover())[0].group.coordinator
 
     def __init__(self):
         print "Discovering devices..."
-        self.speakerDiscover()
+        #self.speakerDiscover()
 
         #self.hueDiscover()
         #self.startScheduler()
@@ -60,6 +61,7 @@ class Brain(object):
         Finds all sonos speakers
 
         """
+        #todo custom group for all speakers
         cls.voice = list(soco.discover())[0].group.coordinator
 
 

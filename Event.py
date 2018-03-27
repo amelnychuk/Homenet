@@ -11,7 +11,7 @@ class Event(object):
     """
 
     def __init__(self, name='None', start=datetime.now(), end=datetime.now(), index=None):
-        self._name = name
+        self.setName(name)
         self._start = start
         self._end = end
         self._scheduler = Brain.getScheduler()
@@ -19,12 +19,12 @@ class Event(object):
 
 
 
-    @property
-    def name(self):
+
+    def getName(self):
         return self._name
 
-    @name.setter
-    def name(self, name):
+
+    def setName(self, name):
         self._name = name
 
 
@@ -59,10 +59,10 @@ class Event(object):
         return eventClass
 
     def __str__(self):
-        return "Event: {} starts at {} and ends at {}".format(self.name, self.getStart(asDateTime=False), self.getEnd(asDateTime=False))
+        return "Event: {} starts at {} and ends at {}".format(self.getName(), self.getStart(asDateTime=False), self.getEnd(asDateTime=False))
 
     def __repr__(self):
-        return "<Event:{} at {} until {}>".format(self.name, self.getStart(asDateTime=False), self.getEnd(asDateTime=False))
+        return "<Event:{} at {} until {}>".format(self.getName(), self.getStart(asDateTime=False), self.getEnd(asDateTime=False))
 
 
 
