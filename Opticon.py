@@ -4,6 +4,7 @@ from House import HouseAI
 from Annoucement import Announcement
 
 from datetime import datetime, timedelta
+import pytz
 import time
 
 
@@ -16,8 +17,15 @@ def main():
     #House.getRoutine(name='amelnychukoseen@gmail.com')
     House.Calendar.getEventData('Routine')
     ed = House.Calendar.getEvents('Routine')
-    print "name: ", ed[0].getName()
-    A = Announcement(ed[0])
+    #print ed
+    for e in ed:
+
+
+        if e.getStart() > datetime.utcnow().replace(tzinfo=pytz.UTC):
+            print e.getName()
+            A = Announcement(event=e)
+
+
 
     #todo convert to announcements and build
     #todo build job to collect information every day
