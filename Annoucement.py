@@ -48,15 +48,16 @@ class Announcement(Event):
 
     def progress(self):
         duration = self.getEnd() - self.getStart()
-        if duration.hour > 1:
-            amount = 10
-            for i in range(amount):
-                newtime = duration * (i / float(amount))
+        if duration.seconds % 3600 // 60 > 1:
+            amount = 4
+            for i in range(amount-1):
+                newtime = duration / int(1 / ((i + 1) / float(amount)))
                 newtime = self.getStart() + newtime
 
-                msg = "{} is {} percent complete".format(self._name, (i/float(amount)) * 100)
+                msg = "{} is {} percent complete".format(self._name, (int(i+1/float(amount)) * 100))
 
                 self.makeJob(msg, newtime)
+
 
 
 
@@ -65,18 +66,18 @@ class Announcement(Event):
 
         announce = Sound(msg)
         #announce.buildMp3()
-        #announce()
-
+        announce()
+        """
         Job = schedule.Job(interval=1, scheduler=self._scheduler)
         Job.unit = 'days'
         str_time = "{}:{}".format(start.hour, start.minute)
         print "Starting warning at: ", str_time
         Job.at(str_time).do(announce)
-
+        """
     def announcements(self):
-        self.begin()
-        self.warning(minutes=5)
-        self.warning(minutes=1)
+        #self.begin()
+        #self.warning(minutes=5)
+        #self.warning(minutes=1)
         self.progress()
 
     def __str__(self):
