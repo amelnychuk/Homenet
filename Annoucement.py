@@ -50,7 +50,7 @@ class Announcement(Event):
         duration = self.getEnd() - self.getStart()
         if duration.seconds % 3600 // 60 > 1:
             amount = 4
-            for i in range(1,amount):
+            for i in range(1, amount):
                 newtime = duration / int(1 / ((i + 1) / float(amount)))
                 newtime = self.getStart() + newtime
                 progress = i/float(amount) * 100
@@ -65,15 +65,15 @@ class Announcement(Event):
     def makeJob(self, msg, start):
 
         announce = Sound(msg)
-        #announce.buildMp3()
-        announce()
-        """
+        announce.buildMp3()
+        #announce()
+
         Job = schedule.Job(interval=1, scheduler=self._scheduler)
         Job.unit = 'days'
         str_time = "{}:{}".format(start.hour, start.minute)
         print "Starting warning at: ", str_time
         Job.at(str_time).do(announce)
-        """
+
     def announcements(self):
         self.begin()
         #self.warning(minutes=5)
