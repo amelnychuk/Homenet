@@ -47,9 +47,6 @@ class HouseAI(Brain):
         #dictionary of events
         self._events = {}
 
-    def calendarEventsToReminders(self):
-        job = schedule.Job(interval=2, scheduler=self.Schedule)
-        job.at("6:50").do(self.getRoutine)
 
     def morningRoutine(self):
         self.announceEvents()
@@ -68,17 +65,16 @@ class HouseAI(Brain):
             if i == len(self.Calendar.getEvents('Routine')) - 1:
                 A.setIndex(-1)
 
-    def runSchedule(self):
+    def collectEventsJob(self):
         ##todo::run every week day
         Job = schedule.Job(interval=1, scheduler=self.getScheduler())
         Job.unit = 'days'
         Job.at("06:45").do(self.morningRoutine)
 
-    #schedule commands
+    def run(self):
+        while True:
+            self.getScheduler().run_pending()
 
-
-
-    #Calendar commands
 
     def startCalendar(self):
         print "Getting google calendar"
