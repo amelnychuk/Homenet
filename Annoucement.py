@@ -44,7 +44,12 @@ class Announcement(Event):
         td = timedelta(minutes=minutes)
         start = self.getEnd() - td
 
+
         self.makeJob(msg, start)
+
+        if self.getIndex() == 0:
+            start  = self.getStart() - td
+            self.makeJob(msg, start)
 
     def progress(self):
         duration = self.getEnd() - self.getStart()
@@ -76,8 +81,8 @@ class Announcement(Event):
 
     def announcements(self):
         self.begin()
-        #self.warning(minutes=5)
-        #self.warning(minutes=1)
+        self.warning(minutes=5)
+        self.warning(minutes=1)
         self.progress()
 
     def __str__(self):
