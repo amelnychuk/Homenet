@@ -12,6 +12,7 @@ from Brain import Brain
 
 from Calendar import GoogleCalendar
 import schedule
+from Annoucement import Announcement
 
 
 
@@ -50,23 +51,28 @@ class HouseAI(Brain):
         job = schedule.Job(interval=2, scheduler=self.Schedule)
         job.at("6:50").do(self.getRoutine)
 
-
-
-    def eventConvert(self):
-
-        jobs = []
-        self.Sounds = {}
-        for routine in self.routines:
-
-            announcement = Sound(routine.name)
-
-            Sound = self.announcements.setdefault(routine.name, announcement)
-
-            job = schedule.Job(inteval=2, scheduler=self.Schedule)
-            job.at(routine.start).do(self.announcements[routine.name])
+    def morningRoutine(self):
+        self.announceEvents()
 
 
 
+
+
+
+    def announceEvents(self):
+
+        self.Calendar.getEventData('Routine')
+        events = self.Calendar.getEvents('Routine')
+        for i, evt in enumerate(events):
+            A = Announcement(event=evt)
+            if i == len(self.Calendar.getEvents('Routine')) - 1:
+                A.setIndex(-1)
+
+    def runSchedule(self):
+        ##todo::run every week day
+        Job = schedule.Job(interval=1, scheduler=self.getScheduler())
+        Job.unit = 'days'
+        Job.at("06:45").do(self.morningRoutine)
 
     #schedule commands
 
@@ -99,14 +105,6 @@ class HouseAI(Brain):
         return cls.lights.keys()
 
 
-
-
-
-    def run(self):
-        #start http server
-        #run scheduals
-        #build mp3s
-        pass
 
 
 
