@@ -6,12 +6,16 @@ from Sound import Sound
 
 
 import schedule
-import time
+
 from datetime import datetime, timedelta
 
 
 
 class Announcement(Event):
+    """
+    Build sound jobs from events.
+
+    """
     def __init__(self, name='None', start=datetime.now(), end=datetime.now(), event = None):
 
         if isinstance(event, Event):
@@ -28,11 +32,22 @@ class Announcement(Event):
 
 
     def begin(self):
+        """
+        Makes a job to announce the start of an event
+
+        """
         print "begin: ", self.getName(), self._name
         msg = "It is time for {}.".format(self.getName())
         self.makeJob(msg, self.getStart())
 
     def warning(self, minutes):
+        """
+        Makes jobs to run before an event starts
+
+        :param minutes:
+            How many minutes you want to announce the next event
+
+        """
 
 
         if minutes > 1:
@@ -54,6 +69,12 @@ class Announcement(Event):
             self.makeJob(msg, start)
 
     def progress(self):
+        """
+        Makes jobs if the event is over an hour to announce the progress
+
+        :return:
+            None
+        """
         duration = self.getEnd() - self.getStart()
         if duration.seconds > 3600:
             amount = 4
@@ -63,17 +84,22 @@ class Announcement(Event):
                 progress = i/float(amount) * 100
                 msg = "{} is {} percent complete".format(self._name, int(progress))
 
-                self.makeJob(msg, newtime)
+                self.makeJob(msg, newtime, volume=20)
 
 
 
 
 
-    def makeJob(self, msg, start):
+    def makeJob(self, msg, start, volume=None):
+        """
 
+        Builds a scheduler Job object to annouce an mp3 at a certain time.
+        """
         announce = Sound(msg)
         announce.buildMp3()
-        #announce()
+        if volume:
+            announce.setVolume(volume)
+
 
         Job = schedule.Job(interval=1, scheduler=self._scheduler)
         Job.unit = 'days'
@@ -82,6 +108,10 @@ class Announcement(Event):
         Job.at(str_time).do(announce)
 
     def announcements(self):
+        """
+        Builds different announcement jobs
+        :return:
+        """
         self.begin()
         self.warning(minutes=5)
         self.warning(minutes=1)
@@ -94,40 +124,6 @@ class Announcement(Event):
         return "<Announce:{} at {} until {}>".format(self.getName(), self.getStart(asDateTime=False), self.getEnd(asDateTime=False))
 
 
-
-
-
-
-
-def eventBeginSound(name):
-    return "{} has begun.".format(name)
-
-def eventProgress(name, time):
-    #percentage of time to time begin
-    percentage = None
-    return "It is {},{} is {} complete.".format(time,name, percentage)
-
-def eventWarning(name, time):
-
-    Sound( "One minute left until the end of {}".format(name))
-
-
-def buildJob(name, start, end, scheduler):
-    Sound(name)
-
-
-
-def buildJobsFromCalendar():
-    pass
-    #get google data
-    #for each event
-
-def test():
-
-    start  = datetime.now() + timedelta(seconds=10)
-    end = start + timedelta(minutes=5)
-
-    A = Announcement(name="Poopy",start=start, end=end)
 
 
 
