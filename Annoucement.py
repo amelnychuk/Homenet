@@ -42,18 +42,20 @@ class Announcement(Event):
         msg = msg.format(minutes)
 
         td = timedelta(minutes=minutes)
-        start = self.getEnd() - td
 
+        #warning until next event, last event doesn't have a next event
+        if self.getIndex() != -1:
+            start = self.getEnd() - td
+            self.makeJob(msg, start)
 
-        self.makeJob(msg, start)
-
+        #add extra warning for the first event
         if self.getIndex() == 0:
-            start  = self.getStart() - td
+            start = self.getStart() - td
             self.makeJob(msg, start)
 
     def progress(self):
         duration = self.getEnd() - self.getStart()
-        if duration.seconds % 3600 // 60 > 1:
+        if duration.seconds > 3600:
             amount = 4
             for i in range(1, amount):
                 newtime = duration / int(1 / ((i + 1) / float(amount)))
