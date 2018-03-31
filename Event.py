@@ -49,6 +49,9 @@ class Event(object):
     def setEnd(self, end):
         self._end = end
 
+    def setIndex(self, idx):
+        self._index = idx
+
     def getIndex(self):
         return self._index
 
