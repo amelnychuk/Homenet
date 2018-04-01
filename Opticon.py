@@ -18,20 +18,23 @@ def main():
     House.Calendar.getEventData('Routine')
     ed = House.Calendar.getEvents('Routine')
     print ed
-    for e in ed:
+    if ed:
+        for e in ed:
 
 
 
-        if e.getStart() > datetime.utcnow().replace(tzinfo=pytz.UTC):
-            print e.getName()
-            print "start: ", e.getStart()
-            print "now: ", datetime.utcnow().replace(tzinfo=pytz.UTC)
+            if e.getStart() > datetime.utcnow().replace(tzinfo=pytz.UTC):
+                print e.getName()
+                print "start: ", e.getStart()
+                print "now: ", datetime.utcnow().replace(tzinfo=pytz.UTC)
 
-            Announcement(event=e)
+                Announcement(event=e)
 
-    stoptime = datetime.now() + timedelta(hours=2)
-    while datetime.now() < stoptime:
-        House.getScheduler().run_pending()
+        stoptime = datetime.now() + timedelta(hours=2)
+        while datetime.now() < stoptime:
+            House.getScheduler().run_pending()
+    else:
+        print "No Jobs"
 
 
 
