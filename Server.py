@@ -34,7 +34,7 @@ class HttpServer(Thread):
 
     def __init__(self, port):
         super(HttpServer, self).__init__()
-        os.chdir("./mp3/Notifications")
+        os.chdir("./mp3")
         self.daemon = True
         handler = SimpleHTTPRequestHandler
         self.httpd = TCPServer(("", port), handler)
